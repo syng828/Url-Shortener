@@ -69,4 +69,8 @@ def alias_to_url(database: str, alias: str):
     c = conn.cursor()
     with conn:
         c.execute("SELECT url from urls WHERE alias=?", (alias,))
-    return (c.fetchone())
+    result = c.fetchone()
+    if result:
+        return (result[0])
+    else:
+        raise ValueError((f"No URL found for alias: {alias}"))

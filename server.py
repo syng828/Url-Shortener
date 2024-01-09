@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 import uvicorn
 import sqlite_helpers as helpers
 from fastapi.testclient import TestClient
@@ -34,8 +34,8 @@ def list_all():
 @app.get('/find/{alias}')
 def find_alias(alias: str):
     try:
-        url = helpers.alias_to_url(DATABASE, alias)
-        return {"url": url}
+        target_url = helpers.alias_to_url(DATABASE, alias)
+        return RedirectResponse(url=target_url)
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
