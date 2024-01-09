@@ -11,7 +11,8 @@ def create_connection():
 def create_table():
     conn = create_connection()
     c = conn.cursor()
-    c.execute(""" CREATE TABLE IF NOT EXISTS urls
+    with conn:
+        c.execute(""" CREATE TABLE IF NOT EXISTS urls
               (id INTEGER PRIMARY KEY AUTOINCREMENT, 
               url TEXT,
               alias TEXT,
@@ -45,21 +46,24 @@ def delete_alias(alias: str):
 def list_urls():
     conn = create_connection()
     c = conn.cursor()
-    c.execute("SELECT url from urls")
+    with conn:
+        c.execute("SELECT url from urls")
     return (c.fetchall())
 
 
 def list_alias_url():
     conn = create_connection()
     c = conn.cursor()
-    c.execute("SELECT url alias from urls")
+    with conn:
+        c.execute("SELECT url alias from urls")
     return (c.fetchall())
 
 
 def alias_to_url(alias: str):
     conn = create_connection()
     c = conn.cursor()
-    c.execute("SELECT url from urls WHERE alias=?", (alias,))
+    with conn:
+        c.execute("SELECT url from urls WHERE alias=?", (alias,))
     return (c.fetchone())
 
 
