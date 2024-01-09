@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 import uvicorn
 import sqlite_helpers as helpers
 from fastapi.testclient import TestClient
+import hash
 
 app = FastAPI()
 
@@ -15,7 +16,9 @@ async def create_url(request: Request):
     try:
         data = await request.json()
         url = data["url"]
-        alias = data["alias"]
+        alias = data.get("alias", None)
+        if (alias is None):
+            alias = hash.create_alias(url)
         helpers.insert_url(DATABASE, url, alias)
         return {"url": url, "alias": alias}
     except Exception as e:

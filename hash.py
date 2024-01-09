@@ -12,8 +12,3 @@ def create_alias(url: str):
     alias = base64.urlsafe_b64encode(
         hash_bytes).decode('utf-8')[:5]
     return alias
-
-
-print(create_alias("https://youtube.com"))
-print(create_alias("https://youtube.com"))
-print(create_alias("https://google.com"))
