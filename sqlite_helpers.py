@@ -15,7 +15,7 @@ def create_table():
         c.execute(""" CREATE TABLE IF NOT EXISTS urls
               (id INTEGER PRIMARY KEY AUTOINCREMENT, 
               url TEXT,
-              alias TEXT,
+              alias TEXT UNIQUE,
               timestamp TIME
               ) """)
 
