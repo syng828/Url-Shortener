@@ -46,14 +46,22 @@ def list_urls(database: str):
             "created_at": row[3]
         }
         db_array.append(data)
+    return db_array
 
 
 def list_alias_url(database: str):
     conn = sqlite3.connect(database)
     c = conn.cursor()
-    with conn:
-        c.execute("SELECT url alias from urls")
-    return (c.fetchall())
+    c.execute("SELECT url, alias from urls")
+    result = c.fetchall()
+    db_array = []
+    for row in result:
+        data = {
+            "url": row[0],
+            "alias": row[1],
+        }
+        db_array.append(data)
+    return db_array
 
 
 def alias_to_url(database: str, alias: str):
