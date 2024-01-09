@@ -38,7 +38,7 @@ def listUrls():
 
 def aliasToUrl(alias: str):
     c.execute("SELECT url from Urls WHERE alias=?", (alias,))
-    print(c.fetchall())
+    print(c.fetchone())
 
 
 # TESTING
