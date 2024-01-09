@@ -48,7 +48,7 @@ def find_alias(alias: str):
 def delete_alias(alias: str):
     try:
         helpers.delete_alias(alias)
-        return {"The alias was deleted successfully."}
+        return {f"Alias {alias} was deleted successfully."}
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
