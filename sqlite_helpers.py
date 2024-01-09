@@ -1,14 +1,16 @@
 import sqlite3
 import datetime
 
-conn = sqlite3.connect(":memory:")
-
-c = conn.cursor()
-
 # SQL HELPER FUNCTIONS
 
 
+def create_connection():
+    return sqlite3.connect("urls.db")
+
+
 def create_table():
+    conn = create_connection()
+    c = conn.cursor()
     c.execute(""" CREATE TABLE IF NOT EXISTS urls
               (id INTEGER PRIMARY KEY AUTOINCREMENT, 
               url TEXT,
@@ -19,38 +21,50 @@ def create_table():
 
 def insert_url(url: str, alias: str):
     time = datetime.datetime.now()
+    conn = create_connection()
+    c = conn.cursor()
     with conn:
         c.execute("INSERT INTO urls (url, alias, timestamp) VALUES (?, ?, ?)", (
                   url, alias, time))
 
 
 def delete_url(url: str):
+    conn = create_connection()
+    c = conn.cursor()
     with conn:
         c.execute("DELETE from urls WHERE url=?", (url,))
 
 
 def delete_alias(alias: str):
+    conn = create_connection()
+    c = conn.cursor()
     with conn:
         c.execute("DELETE from urls WHERE alias=?", (alias,))
 
 
 def list_urls():
+    conn = create_connection()
+    c = conn.cursor()
     c.execute("SELECT url from urls")
-    print(c.fetchall())
+    return (c.fetchall())
 
 
 def list_alias_url():
-    c.execute("SELECT url, alias from urls")
-    print(c.fetchall())
+    conn = create_connection()
+    c = conn.cursor()
+    c.execute("SELECT url alias from urls")
+    return (c.fetchall())
 
 
 def alias_to_url(alias: str):
+    conn = create_connection()
+    c = conn.cursor()
     c.execute("SELECT url from urls WHERE alias=?", (alias,))
-    print(c.fetchone())
+    return (c.fetchone())
 
 
 # TESTING
-'''create_table()
+'''create_table(c)
 
 insert_url("https://www.google.com/", "Google")
 insert_url("https://github.com/", "GitHub")
@@ -63,4 +77,4 @@ list_urls()  # should not contain google.com
 delete_alias("YouTube")
 list_alias_url()  # should not contain youtube
 
-alias_to_url("GitHub")  # should return github.com'''
+alias_to_url("GitHub")  # should return github.com '''
