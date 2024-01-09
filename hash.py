@@ -7,7 +7,7 @@ def create_alias(url: str):
     hasher = hashlib.sha256(url_bytes)
     hash_bytes = hasher.digest()
     alias = base64.urlsafe_b64encode(
-        hash_bytes).decode('utf-8').rstrip('=')[:5]
+        hash_bytes).decode('utf-8')[:5]
     return alias
 
 
