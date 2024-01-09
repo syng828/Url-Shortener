@@ -43,8 +43,8 @@ def find_alias(alias: str):
 @app.post('/delete/{alias}')
 def delete_alias(alias: str):
     try:
-        helpers.delete_alias(DATABASE, alias)
-        return {{f"Alias {alias} was deleted successfully."}}
+        helpers.delete_alias(alias)
+        return {f"Alias {alias} was deleted successfully."}
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
