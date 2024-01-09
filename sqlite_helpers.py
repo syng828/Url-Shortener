@@ -4,81 +4,61 @@ import datetime
 # SQL HELPER FUNCTIONS
 
 
-def create_connection():
-    return sqlite3.connect("urls.db")
-
-
-def create_table():
-    conn = create_connection()
+def create_table(database: str):
+    conn = sqlite3.connect(database)
     c = conn.cursor()
     with conn:
         c.execute(""" CREATE TABLE IF NOT EXISTS urls
               (id INTEGER PRIMARY KEY AUTOINCREMENT, 
               url TEXT,
-              alias TEXT,
+              alias TEXT UNIQUE,
               timestamp TIME
               ) """)
 
 
-def insert_url(url: str, alias: str):
+def insert_url(database: str, url: str, alias: str):
     time = datetime.datetime.now()
-    conn = create_connection()
+    conn = sqlite3.connect(database)
     c = conn.cursor()
     with conn:
         c.execute("INSERT INTO urls (url, alias, timestamp) VALUES (?, ?, ?)", (
                   url, alias, time))
 
 
-def delete_url(url: str):
-    conn = create_connection()
-    c = conn.cursor()
-    with conn:
-        c.execute("DELETE from urls WHERE url=?", (url,))
-
-
-def delete_alias(alias: str):
-    conn = create_connection()
+def delete_alias(database: str, alias: str):
+    conn = sqlite3.connect(database)
     c = conn.cursor()
     with conn:
         c.execute("DELETE from urls WHERE alias=?", (alias,))
 
 
-def list_urls():
-    conn = create_connection()
+def list_urls(database: str):
+    conn = sqlite3.connect(database)
     c = conn.cursor()
-    with conn:
-        c.execute("SELECT url from urls")
-    return (c.fetchall())
+    c.execute("SELECT * from urls")
+    result = c.fetchall()
+    db_array = []
+    for row in result:
+        data = {
+            "id": row[0],
+            "url": row[1],
+            "alias": row[2],
+            "created_at": row[3]
+        }
+        db_array.append(data)
 
 
-def list_alias_url():
-    conn = create_connection()
+def list_alias_url(database: str):
+    conn = sqlite3.connect(database)
     c = conn.cursor()
     with conn:
         c.execute("SELECT url alias from urls")
     return (c.fetchall())
 
 
-def alias_to_url(alias: str):
-    conn = create_connection()
+def alias_to_url(database: str, alias: str):
+    conn = sqlite3.connect(database)
     c = conn.cursor()
     with conn:
         c.execute("SELECT url from urls WHERE alias=?", (alias,))
     return (c.fetchone())
-
-
-# TESTING
-'''create_table(c)
-
-insert_url("https://www.google.com/", "Google")
-insert_url("https://github.com/", "GitHub")
-insert_url("https://youtube.com/", "YouTube")
-list_urls()  # Gives all urls
-
-delete_url("https://www.google.com/")
-list_urls()  # should not contain google.com
-
-delete_alias("YouTube")
-list_alias_url()  # should not contain youtube
-
-alias_to_url("GitHub")  # should return github.com '''
