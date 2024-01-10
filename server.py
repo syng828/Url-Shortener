@@ -4,7 +4,6 @@ import uvicorn
 import sqlite_helpers as helpers
 from fastapi.testclient import TestClient
 import hash
-import sqlite3
 
 app = FastAPI()
 
