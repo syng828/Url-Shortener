@@ -55,10 +55,3 @@ def delete_alias(alias: str):
 
 if __name__ == "__main__":
     uvicorn.run("server:app", port=8000, reload=True)
-
-# test
-'''client = TestClient(app)
-url = '/create_url'
-data = {"url": 'google.com'}
-response = client.post(url, json=data)
-print(response.json())'''

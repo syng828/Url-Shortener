@@ -34,7 +34,8 @@ def delete_alias(database: str, alias: str):
 def list_urls(database: str):
     conn = sqlite3.connect(database)
     c = conn.cursor()
-    c.execute("SELECT * from urls")
+    with conn:
+        c.execute("SELECT * from urls")
     result = c.fetchall()
     db_array = []
     for row in result:
@@ -51,7 +52,8 @@ def list_urls(database: str):
 def list_alias_url(database: str):
     conn = sqlite3.connect(database)
     c = conn.cursor()
-    c.execute("SELECT url, alias from urls")
+    with conn:
+        c.execute("SELECT url, alias from urls")
     result = c.fetchall()
     db_array = []
     for row in result:
@@ -66,14 +68,10 @@ def list_alias_url(database: str):
 def alias_to_url(database: str, alias: str):
     conn = sqlite3.connect(database)
     c = conn.cursor()
-
-    try:
+    with conn:
         c.execute("SELECT url from urls WHERE alias=?", (alias,))
-        result = c.fetchone()
-        # does print correct value, but the alias changes to the url in the query
-        if result:
-            return (result[0])
-        else:
-            raise ValueError((f"No URL found for alias: {alias}"))
-    finally:
-        conn.close()
+    result = c.fetchone()
+    if result:
+        return (result[0])
+    else:
+        raise ValueError((f"No URL found for alias: {alias}"))
