@@ -10,7 +10,7 @@ def get_args():
         "--host", help="Host for the server", default="localhost")
     parser.add_argument("--port", help="Port for the server",
                         default=5000, type=int)
-    print(parser.parse_args())
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
