@@ -1,6 +1,5 @@
 import sqlite3
 import datetime
-
 # SQL HELPER FUNCTIONS
 
 
@@ -35,7 +34,8 @@ def delete_alias(database: str, alias: str):
 def list_urls(database: str):
     conn = sqlite3.connect(database)
     c = conn.cursor()
-    c.execute("SELECT * from urls")
+    with conn:
+        c.execute("SELECT * from urls")
     result = c.fetchall()
     db_array = []
     for row in result:
@@ -52,7 +52,8 @@ def list_urls(database: str):
 def list_alias_url(database: str):
     conn = sqlite3.connect(database)
     c = conn.cursor()
-    c.execute("SELECT url, alias from urls")
+    with conn:
+        c.execute("SELECT url, alias from urls")
     result = c.fetchall()
     db_array = []
     for row in result:
