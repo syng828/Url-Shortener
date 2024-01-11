@@ -4,8 +4,10 @@ import uvicorn
 import sqlite_helpers as helpers
 from fastapi.testclient import TestClient
 import hash
+import args
 
 app = FastAPI()
+args = args.get_args()
 
 DATABASE = "urls.db"
 helpers.create_table(DATABASE)

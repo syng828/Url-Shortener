@@ -18,8 +18,4 @@ def get_args():
         help="Port for the server",
         default=5000,
         type=int)
-    print(parser.parse_args())
-
-
-if __name__ == "__main__":
-    get_args()
+    return parser.parse_args()
