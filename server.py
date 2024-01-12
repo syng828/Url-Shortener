@@ -3,13 +3,13 @@ from fastapi.responses import JSONResponse, RedirectResponse
 import uvicorn
 import sqlite_helpers as helpers
 from fastapi.testclient import TestClient
+from args import get_args
 import hash
-import args
 
 app = FastAPI()
 
-arguments = args.get_args()
-DATABASE = arguments.database_file
+args = get_args()
+DATABASE = args.database_file
 helpers.create_table(DATABASE)
 
 
@@ -55,4 +55,5 @@ def delete_alias(alias: str):
 
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", port=8000, reload=True)
+    args = get_args()
+    uvicorn.run("server:app", host=args.host, port=args.port, reload=True)
