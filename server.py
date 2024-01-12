@@ -7,9 +7,9 @@ import hash
 import args
 
 app = FastAPI()
-arguments = args.get_args()
 
-DATABASE = "urls.db"
+arguments = args.get_args()
+DATABASE = arguments.database_file
 helpers.create_table(DATABASE)
 
 
