@@ -4,11 +4,12 @@ import uvicorn
 import sqlite_helpers as helpers
 from fastapi.testclient import TestClient
 import hash
-import sqlite3
+import args
 
 app = FastAPI()
 
-DATABASE = "urls.db"
+arguments = args.get_args()
+DATABASE = arguments.database_file
 helpers.create_table(DATABASE)
 
 
