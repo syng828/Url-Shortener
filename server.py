@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 import uvicorn
 import sqlite_helpers as helpers
 from fastapi.testclient import TestClient
@@ -22,19 +22,19 @@ async def create_url(request: Request):
         alias = data.get("alias", None)
         if (url is None):  # url not provided
             raise HTTPException(
-                status_code=HttpStatus.BAD_REQUEST.value, detail="Url not provided.")
+                status_code=HttpStatus.BAD_REQUEST.code, detail="Url not provided.")
         if (helpers.alias_exists(DATABASE, alias)):  # alias exists
             raise HTTPException(
-                status_code=HttpStatus.INVALID.value, detail="Alias already exists.")
+                status_code=HttpStatus.INVALID.code, detail="Alias already exists.")
         if (alias is None):  # creates random alias if not given.
             alias = create_alias(url)
         helpers.insert_url(DATABASE, url, alias)
         return {"url": url, "alias": alias}
-    except HTTPException as http_exception:
-        raise http_exception
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(
-            status_code=HttpStatus.INTERNAL_SERVER_ERROR.value, detail=str(e))
+            status_code=HttpStatus.INTERNAL_SERVER_ERROR.code, detail=str(e))
 
 
 @app.get('/list_all')
@@ -44,7 +44,7 @@ def list_all():
         return {"url_list": url_list}
     except Exception as e:
         raise HTTPException(
-            status_code=HttpStatus.INTERNAL_SERVER_ERROR.value, detail=str(e))
+            status_code=HttpStatus.INTERNAL_SERVER_ERROR.code, detail=str(e))
 
 
 @app.get('/find/{alias}')
@@ -54,10 +54,10 @@ def find_alias(alias: str):
         return RedirectResponse(url=target_url)
     except ValueError as e:
         raise HTTPException(
-            status_code=HttpStatus.NOT_FOUND.value, detail="Alias not found.")
+            status_code=HttpStatus.NOT_FOUND.code, detail="Alias not found.")
     except Exception as e:
         raise HTTPException(
-            status_code=HttpStatus.INTERNAL_SERVER_ERROR.value, detail=str(e))
+            status_code=HttpStatus.INTERNAL_SERVER_ERROR.code, detail=str(e))
 
 
 @app.post('/delete/{alias}')
@@ -67,13 +67,21 @@ def delete_alias(alias: str):
             return {f"Alias {alias} was deleted successfully."}
         else:
             raise HTTPException(
-                status_code=HttpStatus.NOT_FOUND.value, detail="Alias not found")
-    except HTTPException as http_exception:
-        raise http_exception
+                status_code=HttpStatus.NOT_FOUND.code, detail="Alias not found")
+    except HTTPException as e:
+        raise e
     except Exception as e:
         raise HTTPException(
-            status_code=HttpStatus.INTERNAL_SERVER_ERROR.value, detail=str(e))
+            status_code=HttpStatus.INTERNAL_SERVER_ERROR.code, detail=str(e))
 
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exception):
+    status_code = exception.status_code
+    status_enum = HttpStatus.get_http_codes(status_code)
+    status_description = status_enum.description
+
+    return HTMLResponse(content=status_description, status_code=status_code)
 
 if __name__ == "__main__":
     uvicorn.run("server:app", port=8000, reload=True)
