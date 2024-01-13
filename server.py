@@ -21,8 +21,7 @@ async def create_url(request: Request):
         url = data.get("url", None)
         alias = data.get("alias", None)
         if (url is None):  # url not provided
-            raise HTTPException(
-                status_code=HttpStatus.BAD_REQUEST.code, detail="Url not provided.")
+            raise ValueError("Url not provided.")
         if (helpers.alias_exists(DATABASE, alias)):  # alias exists
             raise HTTPException(
                 status_code=HttpStatus.INVALID.code, detail="Alias already exists.")
@@ -30,6 +29,9 @@ async def create_url(request: Request):
             alias = create_alias(url)
         helpers.insert_url(DATABASE, url, alias)
         return {"url": url, "alias": alias}
+    except ValueError as e:
+        raise HTTPException(
+            status_code=HttpStatus.BAD_REQUEST.code, detail=str(e))
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -66,10 +68,10 @@ def delete_alias(alias: str):
         if (helpers.delete_alias(DATABASE, alias)):
             return {f"Alias {alias} was deleted successfully."}
         else:
-            raise HTTPException(
-                status_code=HttpStatus.NOT_FOUND.code, detail="Alias not found")
-    except HTTPException as e:
-        raise e
+            raise KeyError("Alias not found")
+    except KeyError as e:
+        raise HTTPException(
+            status_code=HttpStatus.NOT_FOUND.code, detail=str(e))
     except Exception as e:
         raise HTTPException(
             status_code=HttpStatus.INTERNAL_SERVER_ERROR.code, detail=str(e))
