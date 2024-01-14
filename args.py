@@ -18,4 +18,9 @@ def get_args():
         help="Port for the server",
         default=5000,
         type=int)
+    parser.add_argument(
+        "--disable_random_alias",
+        action="store_true",
+        help="Disables random alias",
+    )
     return parser.parse_args()

@@ -29,6 +29,7 @@ def delete_alias(database: str, alias: str):
     c = conn.cursor()
     with conn:
         c.execute("DELETE from urls WHERE alias=?", (alias,))
+        return c.rowcount > 0
 
 
 def list_urls(database: str):
@@ -75,3 +76,12 @@ def alias_to_url(database: str, alias: str):
         return (result[0])
     else:
         raise ValueError((f"No URL found for alias: {alias}"))
+
+
+def alias_exists(database: str, alias: str):
+    conn = sqlite3.connect(database)
+    c = conn.cursor()
+    with conn:
+        c.execute("SELECT COUNT(*) FROM urls WHERE alias=?", (alias,))
+        result = c.fetchone()[0]
+        return result > 0
