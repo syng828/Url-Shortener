@@ -86,4 +86,5 @@ async def http_exception_handler(request, exception):
     return HTMLResponse(content=status_description, status_code=status_code)
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", port=8000, reload=True)
+    args = get_args()
+    uvicorn.run("server:app", host=args.host, port=args.port, reload=True)
