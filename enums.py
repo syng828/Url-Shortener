@@ -13,13 +13,12 @@ class HttpStatus(Enum):
         self.code = code
         self.description = description
 
-    def get_http_codes(code):
-        code_to_enum_dict = {
-            200: HttpStatus.OK,
-            404: HttpStatus.NOT_FOUND,
-            422: HttpStatus.INVALID,
-            400: HttpStatus.BAD_REQUEST,
-            409: HttpStatus.CONFLICT,
-            500: HttpStatus.INTERNAL_SERVER_ERROR
-        }
-        return (code_to_enum_dict.get(code))
+
+code_to_enum = {
+    200: HttpStatus.OK,
+    404: HttpStatus.NOT_FOUND,
+    422: HttpStatus.INVALID,
+    400: HttpStatus.BAD_REQUEST,
+    409: HttpStatus.CONFLICT,
+    500: HttpStatus.INTERNAL_SERVER_ERROR
+}

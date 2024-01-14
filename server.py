@@ -5,7 +5,7 @@ import sqlite_helpers as helpers
 from fastapi.testclient import TestClient
 from hash import create_alias
 from args import get_args
-from enums import HttpStatus
+from enums import HttpStatus, code_to_enum
 
 app = FastAPI()
 
@@ -80,7 +80,7 @@ def delete_alias(alias: str):
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exception):
     status_code = exception.status_code
-    status_enum = HttpStatus.get_http_codes(status_code)
+    status_enum = code_to_enum.get(status_code)
     status_description = status_enum.description
 
     return HTMLResponse(content=status_description, status_code=status_code)
