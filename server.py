@@ -22,6 +22,9 @@ async def create_url(request: Request):
         alias = data.get("alias", None)
         if (url is None):  # url not provided
             raise ValueError("Url not provided.")
+        if (args.disable_random_alias):  # if random alias is disabled
+            if (alias is None):
+                raise ValueError("Alias is required.")
         if (helpers.alias_exists(DATABASE, alias)):  # alias exists
             raise HTTPException(
                 status_code=HttpStatus.INVALID.code, detail="Alias already exists.")
@@ -86,5 +89,4 @@ async def http_exception_handler(request, exception):
     return HTMLResponse(content=status_description, status_code=status_code)
 
 if __name__ == "__main__":
-    args = get_args()
-    uvicorn.run("server:app", host=args.host, port=args.port, reload=True)
+    uvicorn.run("server:app", port=8000, reload=True)
