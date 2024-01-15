@@ -24,7 +24,7 @@ def get_args():
         help="Disables random alias",
     )
     parser.add_argument(
-        "--verbose",
+        "--verbose", "-v",
         action="count",
         default=0,
         help="Increase verbosity level"

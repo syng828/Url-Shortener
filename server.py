@@ -116,4 +116,5 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
-    uvicorn.run("server:app", port=8000, reload=True)
+    logging.info(f"Server started on {args.host} {args.port}")
+    uvicorn.run("server:app", host=args.host, port=args.port, reload=True)
