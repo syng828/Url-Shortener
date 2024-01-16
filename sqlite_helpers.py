@@ -95,7 +95,8 @@ def list_urls(database: str):
 
 
 def list_alias_url(database: str):
-    logging.debug("Attempting to list alias and urls with SQLite")
+    logging.debug(
+        f"Attempting to list alias and urls with SQLite in {database}")
     conn = sqlite3.connect(database)
     c = conn.cursor()
     try:
