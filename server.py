@@ -20,9 +20,9 @@ helpers.create_table(DATABASE)
 async def create_url(request: Request):
     try:
         data = await request.json()
+        logging.debug(f"Received data for creating url: {data}")
         url = data.get("url", None)
         alias = data.get("alias", None)
-        logging.debug(f"Received data: {data}")
 
         if (url is None):  # url not provided
             raise ValueError("Url not provided.")
@@ -44,11 +44,11 @@ async def create_url(request: Request):
         return {"url": url, "alias": alias}
 
     except ValueError as e:
-        logging.error(f"ValueError: {str(e)}")
+        logging.exception(f"ValueError: {str(e)}")
         raise HTTPException(
             status_code=HttpStatus.BAD_REQUEST.code, detail=str(e))
     except HTTPException as e:
-        logging.error(f"HTTPException: {str(e.detail)}")
+        logging.exception(f"HTTPException: {str(e.detail)}")
         raise e
     except Exception as e:
         logging.exception(f"Internal server error: {str(e)}")
@@ -59,6 +59,7 @@ async def create_url(request: Request):
 @app.get('/list_all')
 def list_all():
     try:
+        logging.debug("Listing the alias and urls.. ")
         url_list = helpers.list_alias_url(DATABASE)
         return {"url_list": url_list}
     except Exception as e:
@@ -70,10 +71,11 @@ def list_all():
 @app.get('/find/{alias}')
 def find_alias(alias: str):
     try:
+        logging.debug(f"Finding alias: {alias}")
         target_url = helpers.alias_to_url(DATABASE, alias)
         return RedirectResponse(url=target_url)
     except ValueError as e:
-        logging.error("Alias not found in find alias")
+        logging.exception("Alias not found in find alias")
         raise HTTPException(
             status_code=HttpStatus.NOT_FOUND.code, detail="Alias not found.")
     except Exception as e:
@@ -85,12 +87,13 @@ def find_alias(alias: str):
 @app.post('/delete/{alias}')
 def delete_alias(alias: str):
     try:
+        logging.debug(f"Deleting alias: {alias}")
         if (helpers.delete_alias(DATABASE, alias)):
             return {f"Alias {alias} was deleted successfully."}
         else:
             raise KeyError("Alias not found")
     except KeyError as e:
-        logging.error("Alias not found in delete alias")
+        logging.exception("Alias not found in delete alias")
         raise HTTPException(
             status_code=HttpStatus.NOT_FOUND.code, detail=str(e))
     except Exception as e:
