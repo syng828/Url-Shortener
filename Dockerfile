@@ -8,6 +8,6 @@ RUN pip install httpx
 
 COPY . .
 
-EXPOSE 80
-
-ENTRYPOINT ["python", "server.py", "--database_file", "urls.db"]
+EXPOSE 8000
+#Docker is on host 128.0.0.1 with port 8000 exposed
+ENTRYPOINT ["python", "server.py", "--host", "127.0.0.1"] 
