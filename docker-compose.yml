@@ -1,0 +1,11 @@
+services:
+  app:
+    container_name: fastapi-url
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command:
+      - --database_file-path=/tmp/urldatabase.db
+      - -vvv
+    ports:
+      - '8000:8000'
