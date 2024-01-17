@@ -1,12 +1,10 @@
-FROM ubuntu 
-
-RUN apt-get update
-RUN apt-get install -y python3.11 python3-pip
+FROM python:3.11
 
 WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install httpx
 
 COPY . .
 
