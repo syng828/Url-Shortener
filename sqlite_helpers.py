@@ -142,6 +142,15 @@ def alias_to_url(database: str, alias: str):
         raise
 
 
+def alias_exists(database: str, alias: str):
+    conn = sqlite3.connect(database)
+    c = conn.cursor()
+    with conn:
+        c.execute("SELECT COUNT(*) FROM urls WHERE alias=?", (alias,))
+        result = c.fetchone()[0]
+        return result > 0
+
+
 logging.Formatter.converter = time.gmtime
 
 logging.basicConfig(

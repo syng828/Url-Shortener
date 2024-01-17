@@ -1,11 +1,18 @@
+version: '3.7'
 services:
   app:
-    container_name: fastapi-url
+    container_name: fastapi-server
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     command:
-      - --database_file-path=/tmp/urldatabase.db
+      - --database_file=/tmp/urldatabase.db
+      - --port=8000
       - -vvv
     ports:
       - '8000:8000'
+    volumes:
+      - url_data:/tmp/
+
+volumes:
+  url_data:

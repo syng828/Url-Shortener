@@ -11,7 +11,7 @@ def get_args():
     parser.add_argument(
         "--host",
         help="Host for the server",
-        default="localhost",
+        default="0.0.0.0",
         type=str)
     parser.add_argument(
         "--port",
