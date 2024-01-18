@@ -7,7 +7,7 @@ class Metrics(enum.Enum):
     url_count = ("url_count", "Number of URLs in the DB",
                  prometheus_client.Counter, ())
     query_time = ("query_time", "Time taken to execute the SQLite queries",
-                  prometheus_client.Histogram, ("query_type",))
+                  prometheus_client.Summary, ("query_type",))
     http_code = ("http_code", "Number of instances of each HTTP code",
                  prometheus_client.Counter, ("http_code",))
 

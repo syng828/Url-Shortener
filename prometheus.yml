@@ -2,6 +2,6 @@ global:
   scrape_interval: 5s
 
 scrape_configs:
-  - job_name: 'fastapi-server'
+  - job_name: 'fastapi-server-job'
     static_configs:
-      - targets: ['fastapi-server:8000']
+      - targets: ['app:8000']
