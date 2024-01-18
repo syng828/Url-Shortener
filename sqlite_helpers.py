@@ -3,6 +3,7 @@ import datetime
 import logging
 import time
 from args import get_args
+from metrics import MetricsHandler
 # SQL HELPER FUNCTIONS
 
 
@@ -12,15 +13,17 @@ args = get_args()
 def create_table(database: str):
     logging.debug(f"Attempting to create table with SQLite in {database}")
     try:
-        conn = sqlite3.connect(database)
-        c = conn.cursor()
-        with conn:
-            c.execute(""" CREATE TABLE IF NOT EXISTS urls
-                (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                url TEXT,
-                alias TEXT UNIQUE,
-                timestamp TIME
-                ) """)
+        with MetricsHandler.query_time.labels(query_type="create_table").time():
+            conn = sqlite3.connect(database)
+            c = conn.cursor()
+            with conn:
+                c.execute(""" CREATE TABLE IF NOT EXISTS urls
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                    url TEXT,
+                    alias TEXT UNIQUE,
+                    timestamp TIME
+                    ) """)
+
     except sqlite3.DatabaseError as e:
         logging.exception(f"SQLite database error inserting urls")
         raise
@@ -35,11 +38,12 @@ def insert_url(database: str, url: str, alias: str):
         f"Attempting to insert url with SQLite. Database: {database}, url: {url}, alias: {alias}")
     try:
         time = datetime.datetime.now()
-        conn = sqlite3.connect(database)
-        c = conn.cursor()
-        with conn:
-            c.execute("INSERT INTO urls (url, alias, timestamp) VALUES (?, ?, ?)", (
-                url, alias, time))
+        with MetricsHandler.query_time.labels(query_type="insert_url").time():
+            conn = sqlite3.connect(database)
+            c = conn.cursor()
+            with conn:
+                c.execute("INSERT INTO urls (url, alias, timestamp) VALUES (?, ?, ?)", (
+                    url, alias, time))
     except sqlite3.DatabaseError as e:
         logging.exception(f"SQLite database error inserting urls")
         raise
@@ -53,11 +57,12 @@ def delete_alias(database: str, alias: str):
     logging.debug(
         f"Attempting to delete alias with SQLite. Database: {database}, alias: {alias}")
     try:
-        conn = sqlite3.connect(database)
-        c = conn.cursor()
-        with conn:
-            c.execute("DELETE from urls WHERE alias=?", (alias,))
-            return c.rowcount > 0
+        with MetricsHandler.query_time.labels(query_type="delete_alias").time():
+            conn = sqlite3.connect(database)
+            c = conn.cursor()
+            with conn:
+                c.execute("DELETE from urls WHERE alias=?", (alias,))
+                return c.rowcount > 0
     except sqlite3.DatabaseError as e:
         logging.exception(f"SQLite database error inserting urls")
         raise
@@ -70,21 +75,22 @@ def delete_alias(database: str, alias: str):
 def list_urls(database: str):
     logging.debug(f"Attempting to list urls with SQLite in {database}")
     try:
-        conn = sqlite3.connect(database)
-        c = conn.cursor()
-        with conn:
-            c.execute("SELECT * from urls")
-        result = c.fetchall()
-        db_array = []
-        for row in result:
-            data = {
-                "id": row[0],
-                "url": row[1],
-                "alias": row[2],
-                "created_at": row[3]
-            }
-            db_array.append(data)
-            return db_array
+        with MetricsHandler.query_time.labels(query_type="list_urls").time():
+            conn = sqlite3.connect(database)
+            c = conn.cursor()
+            with conn:
+                c.execute("SELECT * from urls")
+            result = c.fetchall()
+            db_array = []
+            for row in result:
+                data = {
+                    "id": row[0],
+                    "url": row[1],
+                    "alias": row[2],
+                    "created_at": row[3]
+                }
+                db_array.append(data)
+                return db_array
     except sqlite3.DatabaseError as e:
         logging.exception(f"SQLite database error listing urls")
         raise
@@ -100,17 +106,18 @@ def list_alias_url(database: str):
     conn = sqlite3.connect(database)
     c = conn.cursor()
     try:
-        with conn:
-            c.execute("SELECT url, alias from urls")
-        result = c.fetchall()
-        db_array = []
-        for row in result:
-            data = {
-                "url": row[0],
-                "alias": row[1],
-            }
-            db_array.append(data)
-        return db_array
+        with MetricsHandler.query_time.labels(query_type="list_alias_url").time():
+            with conn:
+                c.execute("SELECT url, alias from urls")
+            result = c.fetchall()
+            db_array = []
+            for row in result:
+                data = {
+                    "url": row[0],
+                    "alias": row[1],
+                }
+                db_array.append(data)
+            return db_array
     except sqlite3.DatabaseError as e:
         logging.exception(
             f"SQLite database error listing alias and urls")
@@ -124,11 +131,12 @@ def list_alias_url(database: str):
 def alias_to_url(database: str, alias: str):
     logging.debug(f"Attempting to find url with alias {alias} in {database}")
     try:
-        conn = sqlite3.connect(database)
-        c = conn.cursor()
-        with conn:
-            c.execute("SELECT url from urls WHERE alias=?", (alias,))
-        result = c.fetchone()
+        with MetricsHandler.query_time.labels(query_type="alias_to_url").time():
+            conn = sqlite3.connect(database)
+            c = conn.cursor()
+            with conn:
+                c.execute("SELECT url from urls WHERE alias=?", (alias,))
+            result = c.fetchone()
         if result:
             return (result[0])
         else:
@@ -143,12 +151,41 @@ def alias_to_url(database: str, alias: str):
 
 
 def alias_exists(database: str, alias: str):
-    conn = sqlite3.connect(database)
-    c = conn.cursor()
-    with conn:
-        c.execute("SELECT COUNT(*) FROM urls WHERE alias=?", (alias,))
-        result = c.fetchone()[0]
-        return result > 0
+    logging.debug(f"Checking if the alias {alias} exists")
+    try:
+        with MetricsHandler.query_time.labels(query_type="alias_exists").time():
+            conn = sqlite3.connect(database)
+            c = conn.cursor()
+            with conn:
+                c.execute("SELECT COUNT(*) FROM urls WHERE alias=?", (alias,))
+                result = c.fetchone()[0]
+                return result > 0
+    except sqlite3.DatabaseError as e:
+        logging.exception(f"SQLite database error checking if alias exists")
+        raise
+    except Exception as e:
+        logging.exception(
+            f"General exception checking if the alias exists")
+        raise
+
+
+def get_number_of_entries(database: str):
+    logging.debug(f"Checking the number of entries in {database}")
+    try:
+        with MetricsHandler.query_time.labels(query_type="get_number_of_entries").time():
+            conn = sqlite3.connect(database)
+            c = conn.cursor()
+            with conn:
+                c.execute("SELECT COUNT(*) FROM urls")
+                result = c.fetchone()[0]
+                return result
+    except sqlite3.DatabaseError as e:
+        logging.exception(f"SQLite database error checking # of entries")
+        raise
+    except Exception as e:
+        logging.exception(
+            f"General exception checking # of entries")
+        raise
 
 
 logging.Formatter.converter = time.gmtime

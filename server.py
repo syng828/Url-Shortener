@@ -8,6 +8,7 @@ from args import get_args
 from enums import HttpStatus, code_to_enum
 import logging
 import time
+from metrics import MetricsHandler
 
 app = FastAPI()
 
@@ -45,13 +46,17 @@ async def create_url(request: Request):
 
     except ValueError as e:
         logging.exception(f"ValueError: {str(e)}")
+        MetricsHandler.http_code.labels(query_type="BAD REQUEST").inc()
         raise HTTPException(
             status_code=HttpStatus.BAD_REQUEST.code, detail=str(e))
     except HTTPException as e:
         logging.exception(f"HTTPException: {str(e.detail)}")
+        MetricsHandler.http_code.labels(query_type="INVALID").inc()
         raise e
     except Exception as e:
         logging.exception(f"Internal server error: {str(e)}")
+        MetricsHandler.http_code.labels(
+            query_type="INTERNAL_SERVER_ERROR").inc()
         raise HTTPException(
             status_code=HttpStatus.INTERNAL_SERVER_ERROR.code, detail=str(e))
 
@@ -64,6 +69,8 @@ def list_all():
         return {"url_list": url_list}
     except Exception as e:
         logging.exception("Unable to list the urls and aliases")
+        MetricsHandler.http_code.labels(
+            query_type="INTERNAL_SERVER_ERROR").inc()
         raise HTTPException(
             status_code=HttpStatus.INTERNAL_SERVER_ERROR.code, detail=str(e))
 
@@ -76,10 +83,13 @@ def find_alias(alias: str):
         return RedirectResponse(url=target_url)
     except ValueError as e:
         logging.exception("Alias not found in find alias")
+        MetricsHandler.http_code.labels(query_type="NOT_FOUND").inc()
         raise HTTPException(
             status_code=HttpStatus.NOT_FOUND.code, detail="Alias not found.")
     except Exception as e:
         logging.exception(f"Internal server error while finding alias")
+        MetricsHandler.http_code.labels(
+            query_type="INTERNAL_SERVER_ERROR").inc()
         raise HTTPException(
             status_code=HttpStatus.INTERNAL_SERVER_ERROR.code, detail=str(e))
 
@@ -94,10 +104,13 @@ def delete_alias(alias: str):
             raise KeyError("Alias not found")
     except KeyError as e:
         logging.exception("Alias not found in delete alias")
+        MetricsHandler.http_code.labels(query_type="NOT_FOUND").inc()
         raise HTTPException(
             status_code=HttpStatus.NOT_FOUND.code, detail=str(e))
     except Exception as e:
         logging.exception(f"Internal server error while deleting alias")
+        MetricsHandler.http_code.labels(
+            query_type="INTERNAL_SERVER_ERROR").inc()
         raise HTTPException(
             status_code=HttpStatus.INTERNAL_SERVER_ERROR.code, detail=str(e))
 
@@ -121,3 +134,16 @@ logging.basicConfig(
 if __name__ == "__main__":
     logging.info(f"Server started on {args.host} {args.port}")
     uvicorn.run("server:app", host=args.host, port=args.port, reload=True)
+
+# we have a separate __name__ check here due to how FastAPI starts
+# a server. the file is first ran (where __name__ == "__main__")
+# and then calls `uvicorn.run`. the call to run() reruns the file,
+# this time __name__ == "server". the separate __name__ if statement
+# is so the thread references the same instance as the global
+# metrics_handler referenced by the rest of the file. otherwise,
+# the thread interacts with an instance different than the one the
+# server uses
+
+if __name__ == "server":
+    initial_url_count = helpers.get_number_of_entries(DATABASE)
+    MetricsHandler.url_count.inc(initial_url_count)
