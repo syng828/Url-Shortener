@@ -1,14 +1,16 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-import sqlite_helpers as helpers
-from hash import create_alias
-from args import get_args
-from enums import HttpStatus, code_to_enum
 import logging
 import time
-from metrics import MetricsHandler
 import prometheus_client
+
+import backend.sqlite_helpers as helpers
+from backend.hash import create_alias
+from backend.args import get_args
+from backend.enums import HttpStatus, code_to_enum
+from backend.metrics import MetricsHandler
 
 app = FastAPI()
 args = get_args()
@@ -16,6 +18,16 @@ metrics_handler = MetricsHandler.instance()
 
 DATABASE = args.database_file
 helpers.create_table(DATABASE)
+
+# This middleware is required in order to accept requests from other domains such as a React app running on 'localhost:3000'
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post('/create_url')
