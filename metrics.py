@@ -4,12 +4,23 @@ import prometheus_client
 
 
 class Metrics(enum.Enum):
-    url_count = ("url_count", "Number of URLs in the DB",
-                 prometheus_client.Counter, ())
-    query_time = ("query_time", "Time taken to execute the SQLite queries",
-                  prometheus_client.Summary, ("query_type",))
-    http_code = ("http_code", "Number of instances of each HTTP code",
-                 prometheus_client.Counter, ("http_code",))
+    URL_COUNT = (
+        "url_count",
+        "Number of urls in the database",
+        prometheus_client.Counter,
+    )
+    QUERY_TIME = (
+        "query_time",
+        "Time taken to execute SQLite queries",
+        prometheus_client.Summary,
+        ["query_type"],
+    )
+    HTTP_CODE = (
+        "http_code",
+        "Count of each HTTP Response code",
+        prometheus_client.Counter,
+        ['http_code'],
+    )
 
     def __init__(self, title, description, prometheus_type, labels=()):
         # we use the above default value for labels because it matches what's used
