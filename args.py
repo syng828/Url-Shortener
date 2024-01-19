@@ -11,12 +11,12 @@ def get_args():
     parser.add_argument(
         "--host",
         help="Host for the server",
-        default="localhost",
+        default="0.0.0.0",
         type=str)
     parser.add_argument(
         "--port",
         help="Port for the server",
-        default=5000,
+        default=8000,
         type=int)
     parser.add_argument(
         "--disable_random_alias",

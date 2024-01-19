@@ -16,11 +16,12 @@ def create_table(database: str):
         c = conn.cursor()
         with conn:
             c.execute(""" CREATE TABLE IF NOT EXISTS urls
-                (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                url TEXT,
-                alias TEXT UNIQUE,
-                timestamp TIME
-                ) """)
+                    (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                    url TEXT,
+                    alias TEXT UNIQUE,
+                    timestamp TIME
+                    ) """)
+
     except sqlite3.DatabaseError as e:
         logging.exception(f"SQLite database error inserting urls")
         raise
@@ -139,6 +140,42 @@ def alias_to_url(database: str, alias: str):
     except Exception as e:
         logging.exception(
             f"General exception converting alias to url in sqlite")
+        raise
+
+
+def alias_exists(database: str, alias: str):
+    logging.debug(f"Checking if the alias {alias} exists")
+    try:
+        conn = sqlite3.connect(database)
+        c = conn.cursor()
+        with conn:
+            c.execute("SELECT COUNT(*) FROM urls WHERE alias=?", (alias,))
+            result = c.fetchone()[0]
+            return result > 0
+    except sqlite3.DatabaseError as e:
+        logging.exception(f"SQLite database error checking if alias exists")
+        raise
+    except Exception as e:
+        logging.exception(
+            f"General exception checking if the alias exists")
+        raise
+
+
+def get_number_of_entries(database: str):
+    logging.debug(f"Checking the number of entries in {database}")
+    try:
+        conn = sqlite3.connect(database)
+        c = conn.cursor()
+        with conn:
+            c.execute("SELECT COUNT(*) FROM urls")
+            result = c.fetchone()[0]
+            return result
+    except sqlite3.DatabaseError as e:
+        logging.exception(f"SQLite database error checking # of entries")
+        raise
+    except Exception as e:
+        logging.exception(
+            f"General exception checking # of entries")
         raise
 
 
