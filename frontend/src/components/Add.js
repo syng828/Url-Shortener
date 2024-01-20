@@ -1,8 +1,9 @@
 import React from 'react'
 import { useState } from 'react';
 import { addUrl } from '../ApiFunctions';
+import "./Add.css"
 
-export default function Add({ onAddUrl }) {
+export default function Add({ onAddUrl, errorToggle, closeAdd, onError }) {
 
     const [url, setUrl] = useState('');
     const [alias, setAlias] = useState('');
@@ -21,33 +22,43 @@ export default function Add({ onAddUrl }) {
             const data = await addUrl(requestBody);
             if (!data.error) {
                 onAddUrl(data.responseData);
+            } else if (data.error && errorToggle) {
+                onError("add")
             }
         }
         insertUrl();
     }
 
     return (
-        <>
-            <div className='Add'>
+        <div className='add-container' onClick={(e) => {
+            if (e.target.className === "add-container")
+                closeAdd();
+        }}>
+            <div className='add'>
+                <h3>Add Entry</h3>
                 <form onSubmit={handleSubmit}>
-                    <label htmlFor='url'>Url:</label>
-                    <input Url
-                        type='text'
-                        required
-                        value={url}
-                        name='url'
-                        onChange={(e) => setUrl(e.target.value)}
-                    />
-                    <label htmlFor='alias'>Alias:</label>
-                    <input
-                        type='text'
-                        value={alias}
-                        name='alias'
-                        onChange={(e) => setAlias(e.target.value)}
-                    />
+                    <div className="form-group">
+                        <label htmlFor='url'>Url:</label>
+                        <input Url
+                            type='text'
+                            required
+                            value={url}
+                            name='url'
+                            onChange={(e) => setUrl(e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor='alias'>Alias:</label>
+                        <input
+                            type='text'
+                            value={alias}
+                            name='alias'
+                            onChange={(e) => setAlias(e.target.value)}
+                        />
+                    </div>
                     <button type='submit'>Add Entry</button>
                 </form>
-            </div>
-        </>
+            </div >
+        </div >
     );
 }

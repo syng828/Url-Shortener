@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react';
 import { deleteAlias } from '../ApiFunctions';
+import "./Table.css"
 
-export default function Table({ urlData, onDeleteAlias }) {
-    const [loading, isLoading] = useState(true);
+export default function Table({ urlData, onDeleteAlias, errorToggle, onError }) {
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (urlData && urlData.length > 0) {
-            isLoading(false);
+            setLoading(false);
         }
     }, [urlData]);
 
@@ -16,17 +17,19 @@ export default function Table({ urlData, onDeleteAlias }) {
             const data = await deleteAlias(alias);
             if (!data.error) {
                 onDeleteAlias(alias)
+            } else if (data.error && errorToggle) {
+                onError("add")
             }
         }
         removeAlias();
     }
 
     return (
-        <><div className='Table'>
+        <div className='tableWrapper'>
             {loading ? (
                 <p>Loading.. </p>
             ) : (
-                <table>
+                <table className="table">
                     <thead>
                         <tr>
                             <th>Url</th>
@@ -38,7 +41,7 @@ export default function Table({ urlData, onDeleteAlias }) {
                         {urlData &&
                             urlData.map((entry, index) => (
                                 <tr key={index}>
-                                    <td>{entry.url}</td>
+                                    <td >{entry.url}</td>
                                     <td>{entry.alias}</td>
                                     <td><button onClick={() => handleDelete(entry.alias)}>Delete</button></td>
                                 </tr>
@@ -48,7 +51,5 @@ export default function Table({ urlData, onDeleteAlias }) {
                 </table>
             )}
         </div>
-
-        </>
     );
 }

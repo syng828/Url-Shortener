@@ -1,0 +1,27 @@
+.table {
+    table-layout: fixed;
+    box-shadow: 0px 10px 10px #7f7c7c;
+    border-radius: 5px;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+.table thead {
+    background-color: #a6b3e2;
+}
+
+.table th,
+.table td {
+    padding: 20px;
+    word-wrap: break-word;
+    text-align: center;
+}
+
+.table button {
+    background-color: #232d41b2;
+    border-style: none;
+    border-radius: 2px;
+    color: white;
+    padding: 5px;
+}
