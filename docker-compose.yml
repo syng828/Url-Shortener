@@ -1,10 +1,10 @@
 version: '3.7'
 services:
-  app:
+  backend:
     container_name: fastapi-server
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./backend/Dockerfile
     command:
       - --database_file=/tmp/urldatabase.db
       - --port=8000
@@ -13,6 +13,13 @@ services:
       - '8000:8000'
     volumes:
       - url_data:/tmp/
+
+  frontend:
+    container_name: react-server
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+
   prometheus:
     image: prom/prometheus:latest
     restart: always
@@ -22,6 +29,17 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
     ports:
       - '9090:9090'
+
+  nginx:
+    container_name: nginx-server
+    image: nginx:alpine
+    command: [ nginx-debug, '-g', 'daemon off;' ]
+    depends_on:
+      - frontend
+    ports:
+      - 3000:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
 
 volumes:
   url_data:

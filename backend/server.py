@@ -1,14 +1,16 @@
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import logging
+import time
+import prometheus_client
+
 import sqlite_helpers as helpers
 from hash import create_alias
 from args import get_args
 from enums import HttpStatus, code_to_enum
-import logging
-import time
 from metrics import MetricsHandler
-import prometheus_client
 
 app = FastAPI()
 args = get_args()
@@ -16,6 +18,16 @@ metrics_handler = MetricsHandler.instance()
 
 DATABASE = args.database_file
 helpers.create_table(DATABASE)
+
+# This middleware is required in order to accept requests from other domains such as a React app running on 'localhost:3000'
+origins = ["*"]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post('/create_url')
@@ -27,8 +39,8 @@ async def create_url(request: Request):
             url = data.get("url", None)
             alias = data.get("alias", None)
 
-            if (url is None):  # url not provided
-                raise ValueError("Url not provided.")
+            if not url:
+                raise ValueError("Invalid URL format.")
 
             if (args.disable_random_alias):  # if random alias is disabled
                 if (alias is None):
@@ -135,7 +147,8 @@ async def http_exception_handler(request, exception):
     status_enum = code_to_enum.get(status_code)
     status_description = status_enum.description
 
-    return HTMLResponse(content=status_description, status_code=status_code)
+    return HTMLResponse(
+        content=status_description, status_code=status_code)
 
 logging.Formatter.converter = time.gmtime
 
