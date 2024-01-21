@@ -1,4 +1,4 @@
 # pythonUrl
 
-To run the project install docker and run this command 
+To run the project install docker and call this command:
 ## docker-compose up
