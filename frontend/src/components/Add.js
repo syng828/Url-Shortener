@@ -31,11 +31,9 @@ export default function Add({ onAddUrl, errorToggle, closeAdd, onError }) {
                 if (!data.error) {
                     onAddUrl(data.responseData);
                 } else if (data.error && errorToggle) {
-                    console.log("alias is taken")
                     onError("Alias is taken.")
                 }
             } catch (error) {
-                console.log("invalid url")
                 onError(error.message);
             }
         }

@@ -7,21 +7,18 @@ export default function Table({ urlData, onDeleteAlias, errorToggle, onError }) 
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (urlData && urlData.length > 0) {
+        if (urlData) {
             setLoading(false);
         }
     }, [urlData]);
 
-    const handleDelete = (alias) => {
-        async function removeAlias() {
-            const data = await deleteAlias(alias);
-            if (!data.error) {
-                onDeleteAlias(alias)
-            } else if (data.error && errorToggle) {
-                onError("Cannot delete the entry.")
-            }
+    const handleDelete = async (alias) => {
+        const data = await deleteAlias(alias);
+        if (!data.error) {
+            onDeleteAlias(alias)
+        } else if (data.error && errorToggle) {
+            onError("Cannot delete the entry.")
         }
-        removeAlias();
     }
 
     return (

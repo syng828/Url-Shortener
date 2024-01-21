@@ -38,10 +38,3 @@ export async function deleteAlias(alias) {
     })
     return status;
 }
-
-//TODO: right lets test that this all works first. just open up your backend and analyze the response first
-//oh but to do that you need to create the inputs option
-//once it works add in the table too with the useEffect
-//add the randomizer toggle. good for today
-
-//TODO: Add in error rendering, loading regex, css, and the requirements.txt
