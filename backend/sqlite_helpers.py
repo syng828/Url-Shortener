@@ -2,7 +2,7 @@ import sqlite3
 import datetime
 import logging
 import time
-from .args import get_args
+from args import get_args
 # SQL HELPER FUNCTIONS
 
 

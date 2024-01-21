@@ -1,16 +1,16 @@
 from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi.responses import RedirectResponse, HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import logging
 import time
 import prometheus_client
 
-import backend.sqlite_helpers as helpers
-from backend.hash import create_alias
-from backend.args import get_args
-from backend.enums import HttpStatus, code_to_enum
-from backend.metrics import MetricsHandler
+import sqlite_helpers as helpers
+from hash import create_alias
+from args import get_args
+from enums import HttpStatus, code_to_enum
+from metrics import MetricsHandler
 
 app = FastAPI()
 args = get_args()
@@ -39,8 +39,8 @@ async def create_url(request: Request):
             url = data.get("url", None)
             alias = data.get("alias", None)
 
-            if (url is None):  # url not provided
-                raise ValueError("Url not provided.")
+            if not url:
+                raise ValueError("Invalid URL format.")
 
             if (args.disable_random_alias):  # if random alias is disabled
                 if (alias is None):
@@ -147,7 +147,8 @@ async def http_exception_handler(request, exception):
     status_enum = code_to_enum.get(status_code)
     status_description = status_enum.description
 
-    return HTMLResponse(content=status_description, status_code=status_code)
+    return HTMLResponse(
+        content=status_description, status_code=status_code)
 
 logging.Formatter.converter = time.gmtime
 

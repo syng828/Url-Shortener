@@ -18,7 +18,7 @@ export default function Table({ urlData, onDeleteAlias, errorToggle, onError }) 
             if (!data.error) {
                 onDeleteAlias(alias)
             } else if (data.error && errorToggle) {
-                onError("add")
+                onError("Cannot delete the entry.")
             }
         }
         removeAlias();

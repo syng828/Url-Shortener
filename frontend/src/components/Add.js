@@ -14,16 +14,29 @@ export default function Add({ onAddUrl, errorToggle, closeAdd, onError }) {
             const url = e.target.elements.url.value;
             const alias = e.target.elements.alias.value;
             let requestBody;
-            if (alias === '') {
-                requestBody = { "url": url };
-            } else {
-                requestBody = { "url": url, "alias": alias };
-            }
-            const data = await addUrl(requestBody);
-            if (!data.error) {
-                onAddUrl(data.responseData);
-            } else if (data.error && errorToggle) {
-                onError("add")
+            const expression = 'https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)';
+            const regex = new RegExp(expression);
+
+            try {
+                if (!url.match(regex)) {
+                    throw new Error('Invalid URL format');
+                }
+
+                if (alias === '') {
+                    requestBody = { "url": url };
+                } else {
+                    requestBody = { "url": url, "alias": alias };
+                }
+                const data = await addUrl(requestBody);
+                if (!data.error) {
+                    onAddUrl(data.responseData);
+                } else if (data.error && errorToggle) {
+                    console.log("alias is taken")
+                    onError("Alias is taken.")
+                }
+            } catch (error) {
+                console.log("invalid url")
+                onError(error.message);
             }
         }
         insertUrl();
