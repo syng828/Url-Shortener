@@ -1,11 +1,11 @@
-FROM python:3.11
+FROM python:3.9-slim-buster
 
-WORKDIR /app
+WORKDIR /backend
 
-COPY requirements.txt .
+COPY ./backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+COPY ./backend .
 
 EXPOSE 8000
 

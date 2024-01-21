@@ -48,9 +48,8 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Url Shortener</h1>
       <div className="row-wrapper">
-        <Table urlData={urlData} onDeleteAlias={onDeleteAlias} errorToggle={errorToggle} onError={onError} />
+        <h1>Url Shortener</h1>
         <div className="col-wrapper">
           <button className="btn" onClick={() => setAddOpen(true)}>Add</button>
           <label className="errorCheck">
@@ -63,6 +62,7 @@ function App() {
           </label>
         </div>
       </div>
+      <Table urlData={urlData} onDeleteAlias={onDeleteAlias} errorToggle={errorToggle} onError={onError} />
       {addOpen && <Add closeAdd={() => { setAddOpen(false); }} onAddUrl={onAddUrl} errorToggle={errorToggle} onError={onError} />}
       {errorDetails && <ErrorComponent closeError={() => setErrorDetails(null)} message={errorDetails} />}
     </div>

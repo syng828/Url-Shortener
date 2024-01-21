@@ -31,6 +31,7 @@ export default function Table({ urlData, onDeleteAlias, errorToggle, onError }) 
                         <tr>
                             <th>Url</th>
                             <th>Alias</th>
+                            <th>Shortcut</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -40,6 +41,7 @@ export default function Table({ urlData, onDeleteAlias, errorToggle, onError }) 
                                 <tr key={index}>
                                     <td >{entry.url}</td>
                                     <td>{entry.alias}</td>
+                                    <td><a href={`http://localhost:3000/s/${entry.alias}`}>http://localhost:3000/s/{entry.alias}</a></td>
                                     <td><button onClick={() => handleDelete(entry.alias)}>Delete</button></td>
                                 </tr>
                             ))}
